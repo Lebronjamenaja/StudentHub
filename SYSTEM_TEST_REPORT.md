@@ -1,62 +1,210 @@
-# SYSTEM_TEST_REPORT.md — รายงานผลการทดสอบระบบและความปลอดภัย
-## StudentHub — Student Assignment and Task Management System
-
-- **รหัสโครงการ**: StudentHub-Security-Applet
-- **วิชา**: Web Application Development และ Security Testing
-- **วันที่ทดสอบ**: 15 ตุลาคม 2026
-- **สถานะโดยรวม**: **ผ่านการทดสอบทุกกรณี (ALL TESTS PASSED)**
+# รายงานผลการทดสอบระบบ (System Test Report)
+## โครงงาน: ระบบจัดการงานและกำหนดส่งงานสำหรับนักศึกษา (StudentHub)
+### วิชา: Web Application Development and Security Testing
 
 ---
 
-### 1. บทสรุปสำหรับผู้บริหารและอาจารย์ผู้ประเมิน (Executive Summary)
-
-ระบบ **StudentHub** ได้รับการพัฒนาและทดสอบอย่างเข้มงวด โดยเน้นหลักการ **Defense-in-Depth** และ **Zero-Trust Architecture** ข้อมูลทั้งหมดถูกจัดเก็บบน **Cloud Firestore** และยืนยันตัวตนผ่าน **Firebase Authentication** จริง โดยมีระบบสมาชิก 2 บทบาทที่แบ่งแยกหน้าที่อย่างชัดเจน:
-1. **Student (นักศึกษา)**: สามารถบริหารจัดการงาน (CRUD) ส่งงาน และตรวจสอบสถานะได้เฉพาะข้อมูลของตนเองเท่านั้น
-2. **Admin (ผู้ดูแลระบบ)**: สามารถตรวจสอบสถิติภาพรวม ตรวจสอบสมาชิก และจัดการสถานะผู้ใช้ โดยอีเมลของผู้ใช้จะถูกปกปิด (Data Masking) ตลอดเวลา
-
-ระบบผ่านการทดสอบทั้งระดับฟังก์ชันการทำงาน (Functionality) และระดับความปลอดภัย (Security Verification) รวม 12 Test Cases โดยไม่มีช่องโหว่ระดับ High หรือ Critical
-
----
-
-### 2. ผลการประเมินความปลอดภัยตาม OWASP Top 10
-
-| OWASP Vulnerability | มาตรการป้องกันที่นำมาใช้ใน StudentHub | ผลการตรวจสอบ |
-|---|---|---|
-| **A01: Broken Access Control (BAC & IDOR)** | • ใช้ Cloud Firestore Security Rules แบบ Deny-by-Default<br>• เช็ค `resource.data.ownerUid == request.auth.uid`<br>• บังคับนักศึกษาเข้าถึงได้เฉพาะ Task ของตนเอง<br>• บล็อกการ List สมาชิกทั้งหมดสำหรับ Student | **PASS** (ไม่พบช่องโหว่ IDOR) |
-| **A02: Cryptographic Failures** | • ไม่บันทึกรหัสผ่านใน Firestore เป็น Plaintext<br>• จัดการแฮชรหัสผ่านด้วย Firebase Authentication (Argon2 / Scrypt)<br>• สื่อสารผ่าน HTTPS ตลอดเส้นทาง | **PASS** (รหัสผ่านปลอดภัย 100%) |
-| **A03: Injection (XSS & SQLi)** | • ฟังก์ชัน `sanitizeText` กรองอักขระ HTML อันตราย<br>• React Virtual DOM Escape ข้อมูลทุกจุดก่อนแสดงผล<br>• Firestore ใช้ Parameterized NoSQL Reference Model ปลอดจาก SQL Injection | **PASS** (Payload ทั้งหมดถูก Neutralize) |
-| **A04: Insecure Design** | • ออกแบบโมเดลข้อมูลแยกแยะระหว่าง Public และ Restricted Data<br>• บังคับ Role เริ่มต้นเป็น 'student' ในระดับฐานข้อมูล ห้ามกำหนดเป็น 'admin' เอง | **PASS** (Privilege Escalation เป็นไปไม่ได้) |
-| **A05: Security Misconfiguration** | • ไม่เปิด `allow read, write: if true;`<br>• ตั้งค่า Security Headers (X-Frame-Options, X-XSS-Protection, Nosniff) ใน `vercel.json` | **PASS** (Hardened Configuration) |
-| **A06: Vulnerable Components** | • ใช้ไลบรารีเวอร์ชันล่าสุด (React 19, Vite, Tailwind v4, Lucide React, Firebase v10/v11)<br>• ไม่มี Dependency ที่มีช่องโหว่ CVE ร้ายแรง | **PASS** (Zero Known Vulnerabilities) |
-| **A07: Identification & Auth Failures** | • ตรวจสอบความแข็งแกร่งของรหัสผ่าน (Password Strength Meter)<br>• ป้องกัน Brute-Force อัตโนมัติผ่าน Firebase Auth Rate Limiting | **PASS** (Auth Flow สมบูรณ์) |
-| **A08: Software & Data Integrity Failures** | • ตรวจสอบความถูกต้องของ Input ทั้งฝั่ง Client และ Security Rules (Type, Length, Pattern)<br>• ตรวจสอบ URL การส่งงานด้วย RFC-compliant Parser | **PASS** (Data Integrity รับประกัน) |
-| **A09: Security Logging & Monitoring** | • มีฟังก์ชัน `handleFirestoreError` ดักจับข้อผิดพลาดและส่ง Diagnostic Information<br>• บันทึก Error Log โดยไม่เปิดเผย Secret หรือ Token | **PASS** (Safe Logging) |
-| **A10: Server-Side Request Forgery (SSRF)** | • แอปพลิเคชันไม่มีฟังก์ชันฝั่ง Server ที่ร้องขอ URL จากภายนอกโดยไม่ผ่านการกลั่นกรอง | **PASS** (Not Applicable / Low Risk) |
+**ข้อมูลทั่วไปของเอกสาร (Document Information)**
+- **ชื่อระบบ:** StudentHub — Student Assignment and Task Management System
+- **รหัสเอกสาร:** STR-STUDENTHUB-2026-V1
+- **วันที่จัดทำ:** 15 ตุลาคม 2569
+- **เวอร์ชันเอกสาร:** 1.0 (ฉบับสมบูรณ์)
+- **ประเภทการทดสอบ:** Functional Testing, Security Testing (OWASP Top 10), Data Privacy & Authorization Verification
 
 ---
 
-### 3. ผลการทดสอบกรณีศึกษา Dirty Dozen Payloads
+## 1. บทนำและวัตถุประสงค์ (Introduction & Objectives)
 
-ระบบได้รับการทดสอบความแข็งแกร่งของ Firestore Security Rules ต่อ 12 Payloads จำลองการโจมตี:
+### 1.1 บทนำ
+เว็บแอปพลิเคชัน **StudentHub** ได้รับการพัฒนาขึ้นเพื่อแก้ปัญหาการติดตามการบ้าน งานกลุ่ม และกำหนดส่งงานของนักศึกษา โดยมุ่งเน้นการเป็นระบบที่ใช้งานได้จริง มีการเชื่อมต่อกับระบบฐานข้อมูลแบบเรียลไทม์ (Cloud Firestore) และระบบยืนยันตัวตน (Firebase Authentication) มีการแบ่งระดับสิทธิ์ผู้ใช้งานเป็น 2 บทบาทอย่างเคร่งครัด ได้แก่ นักศึกษา (Student) และ ผู้ดูแลระบบ (Admin)
 
-1. **Payload 1 (IDOR Task Read)**: ส่งคำขออ่านงานของผู้อื่น `GET /tasks/{other_task_id}` -> **ผลลัพธ์: PERMISSION_DENIED (Pass)**
-2. **Payload 2 (IDOR Task Update)**: ส่งคำขอแก้ไขงานของผู้อื่น `UPDATE /tasks/{other_task_id}` -> **ผลลัพธ์: PERMISSION_DENIED (Pass)**
-3. **Payload 3 (IDOR Task Delete)**: ส่งคำขอลบงานของผู้อื่น `DELETE /tasks/{other_task_id}` -> **ผลลัพธ์: PERMISSION_DENIED (Pass)**
-4. **Payload 4 (Privilege Escalation on Signup)**: ส่งคำขอสมัครสมาชิกพร้อม `role: 'admin'` -> **ผลลัพธ์: PERMISSION_DENIED กฎบังคับ `role == 'student'` (Pass)**
-5. **Payload 5 (Role Tampering via Update)**: ส่งคำขอแก้ไขโปรไฟล์ตนเองให้มี `role: 'admin'` -> **ผลลัพธ์: PERMISSION_DENIED กฎบังคับ `incoming().role == existing().role` (Pass)**
-6. **Payload 6 (Unauthorized Admin Directory Write)**: ส่งคำขอเพิ่มตนเองใน `/admins/{uid}` -> **ผลลัพธ์: PERMISSION_DENIED (Pass)**
-7. **Payload 7 (Ghost / Shadow Fields Injection)**: ส่งคำขอเพิ่มงานพร้อมฟิลด์แปลกปลอม `isBackdoorActive: true` -> **ผลลัพธ์: PERMISSION_DENIED (Pass)**
-8. **Payload 8 (Denial of Wallet Payload)**: ส่งคำขอสร้างงานด้วยชื่องานขนาดยาว 5,000 ตัวอักษร -> **ผลลัพธ์: PERMISSION_DENIED บังคับขนาด `size() <= 200` (Pass)**
-9. **Payload 9 (Anonymous Probe)**: ส่งคำขออ่านข้อมูลโดยไม่แนบ Auth Token -> **ผลลัพธ์: PERMISSION_DENIED (Pass)**
-10. **Payload 10 (Feedback Spoofing)**: ส่ง Feedback โดยใช้ `userUid` ของนักศึกษาคนอื่น -> **ผลลัพธ์: PERMISSION_DENIED (Pass)**
-11. **Payload 11 (User Scraping Attack)**: บัญชี Student พยายามเรียก `getDocs(collection(db, 'users'))` -> **ผลลัพธ์: PERMISSION_DENIED (Pass)**
-12. **Payload 12 (Task Ownership Reassignment)**: ส่งคำขออัปเดตงานเพื่อเปลี่ยน `ownerUid` ไปยังผู้อื่น -> **ผลลัพธ์: PERMISSION_DENIED บังคับ Immutability (Pass)**
+### 1.2 วัตถุประสงค์ของการทดสอบ
+1. **การทดสอบความถูกต้องของฟังก์ชันงาน (Functional Testing):** เพื่อยืนยันว่ากระบวนการสมัครสมาชิก เข้าสู่ระบบ ออกจากระบบ การสร้าง อ่าน แก้ไข ลบงาน (CRUD) การส่งงาน และการส่งข้อเสนอแนะ ทำงานได้ถูกต้องสมบูรณ์ตามข้อกำหนด
+2. **การทดสอบความปลอดภัยและการควบคุมสิทธิ์ (Security & Authorization Testing):** เพื่อประเมินความปลอดภัยตามมาตรฐาน **OWASP Top 10** โดยเฉพาะการป้องกันช่องโหว่ Insecure Direct Object References (IDOR), Privilege Escalation, Cross-Site Scripting (XSS) และ SQL/NoSQL Injection
+3. **การทดสอบการปกป้องข้อมูลส่วนบุคคล (Data Privacy & Masking):** ตรวจสอบว่าระบบมีการปกปิดอีเมลและข้อมูลส่วนบุคคลของนักศึกษาตามหลัก PDPA ในหน้าจอของผู้ดูแลระบบ
+4. **การทดสอบการแสดงผลบนอุปกรณ์ที่หลากหลาย (Responsive UI Testing):** ยืนยันว่าหน้าจอเว็บแอปพลิเคชันสามารถแสดงผลและใช้งานได้ดีทั้งบนหน้าจอ Desktop, Tablet และ Mobile
 
 ---
 
-### 4. สรุปความพร้อมในการนำไปใช้งานจริง (Production Readiness)
+## 2. ขอบเขตการทดสอบ (Testing Scope)
 
-1. **การ Build**: ผ่านการทดสอบ `npm run build` และ `tsc --noEmit` โดยไม่มีข้อผิดพลาด
-2. **การ Render**: รองรับทั้งจอคอมพิวเตอร์ แท็บเล็ต และสมาร์ตโฟน (Responsive Design)
-3. **การ Deploy**: มีไฟล์ `vercel.json` รองรับ SPA Rewrites เมื่อ Refresh หน้าใด ๆ จะไม่พบปัญหา 404
-4. **การรักษาความลับของข้อมูล**: ซอร์สโค้ดไม่มี Secret, Private Key หรือ Firebase Admin Credentials หลุดรั่ว
+การทดสอบครอบคลุมโมดูลและหน้าจอทั้งหมด 12 หน้าของระบบ ได้แก่:
+1. ระบบสมาชิกและการจัดการสิทธิ์: หน้าเข้าสู่ระบบ (Login) และ หน้าสมัครสมาชิก (Register)
+2. ระบบแดชบอร์ดนักศึกษา: หน้าแดชบอร์ดหลัก (Dashboard)
+3. ระบบจัดการงาน (Task Management): หน้างานของฉัน (My Tasks), หน้าดูรายละเอียดงาน (Task Details)
+4. ฟอร์มการทำงานจริง (Forms): ฟอร์มเพิ่ม/แก้ไขงาน (Form 1), ฟอร์มส่งงาน (Form 2), ฟอร์มส่งข้อเสนอแนะ (Form 3)
+5. ระบบโปรไฟล์และความปลอดภัยส่วนบุคคล: หน้าโปรไฟล์ (Profile)
+6. ระบบบริหารจัดการสำหรับผู้ดูแลระบบ: แดชบอร์ดผู้ดูแล (Admin Dashboard), จัดการสมาชิก (User Management)
+7. ระบบจัดการข้อผิดพลาดตามความปลอดภัย: หน้า 403 Forbidden และ หน้า 404 Not Found
+8. การแสดงผลแบบ Responsive UI บนขนาดหน้าจอ Viewport ต่าง ๆ
+
+---
+
+## 3. สภาพแวดล้อมที่ใช้ทดสอบ (Test Environment)
+
+| องค์ประกอบ (Component) | รายละเอียดที่ใช้ทดสอบ (Specification) |
+|---|---|
+| **Operating System** | Linux (Ubuntu 24.04 LTS), Windows 11, macOS Sequoia |
+| **Web Browsers** | Google Chrome 130+, Mozilla Firefox 131+, Safari 18+, Microsoft Edge |
+| **Mobile Viewport** | iPhone 14/15 (390x844), iPad Air (820x1180), Desktop (1920x1080) |
+| **Frontend Framework** | React 19.0.1, TypeScript 5.8+, Vite 8.3.0 |
+| **Styling Engine** | Tailwind CSS v4, Lucide React Icons |
+| **Authentication Engine** | Firebase Authentication (Email/Password & Google OAuth) |
+| **Cloud Database** | Cloud Firestore (Google Cloud Project ID: `studenthub-62716`) |
+| **Security Enforcer** | Cloud Firestore Security Rules (ABAC / Zero-Trust Model) |
+| **Hosting Platform** | AI Studio Cloud Run Engine & Vercel Edge Network (with `vercel.json` SPA Rewrites) |
+
+---
+
+## 4. รายการฟังก์ชันที่ทดสอบ (Test Features Specification)
+
+1. **โมดูลการยืนยันตัวตน (Authentication):** ตรวจสอบฟอร์ม Register (ตรวจสอบความยาวรหัสผ่าน, ความปลอดภัย, ป้องกันอีเมลซ้ำ), Login, Logout, Session Persistence, และ Error Handling
+2. **โมดูลจัดการงาน (Task CRUD):** ตรวจสอบการเพิ่มงาน (Create), การค้นหา/กรองสถานะ/ความสำคัญ/มุมมองปฏิทิน (Read), การแก้ไขข้อมูล (Update), และการลบงานพร้อม Confirm Modal (Delete)
+3. **โมดูลการส่งงาน (Assignment Submission):** ตรวจสอบการเลือกงาน, การตรวจสอบรูปแบบ URL (RFC URL Validation), การบันทึกเวลาที่ส่ง และการอัปเดตสถานะเป็น เสร็จสมบูรณ์
+4. **โมดูลข้อเสนอแนะ (Feedback):** ตรวจสอบการระบุหมวดหมู่บั๊ก/ฟีเจอร์/ความปลอดภัย, การบันทึกลงฐานข้อมูล, การแสดงประวัติย้อนหลัง
+5. **โมดูลข้อมูลส่วนตัว (Profile):** ตรวจสอบการแก้ไขชื่อ นามสกุล, การเปลี่ยนรหัสผ่านใหม่ (Password Update)
+6. **โมดูลการปกปิดข้อมูล (Data Masking):** ตรวจสอบฟังก์ชัน `maskEmail` ในหน้าตารางผู้ดูแล
+7. **โมดูลควบคุมการเข้าถึง (Authorization & Access Control):** ตรวจสอบการบล็อก IDOR ในระดับ Cloud Firestore และการสกัดกั้น Student เข้าหน้า Admin นำไปสู่หน้า 403 Forbidden
+8. **โมดูล Responsive UI:** ตรวจสอบ Layout, Sidebar Drawer บน Mobile, Navigation Bar, และ Cards/Tables
+
+---
+
+## 5. ตารางผลการทดสอบจริง (Detailed Test Execution Matrix)
+
+เกณฑ์การกำหนดสถานะ (Status Definition):
+- **PASS:** ฟังก์ชันหรือมาตรการความปลอดภัยทำงานได้ถูกต้องตาม Expected Result อย่างสมบูรณ์
+- **FAIL:** ฟังก์ชันทำงานผิดพลาด หรือมีช่องโหว่ความปลอดภัยที่ไม่เป็นไปตามที่กำหนด
+- **BLOCKED:** การทดสอบไม่สามารถดำเนินการต่อได้เนื่องจากติดปัญหาในระบบส่วนอื่น
+- **NOT TESTED:** ยังไม่ได้ทำการทดสอบจริงในรอบการประเมินนี้
+
+---
+
+### ตารางบันทึกการทดสอบ (Test Cases)
+
+| Test ID | หัวข้อการทดสอบ | ขั้นตอนการทดสอบ (Steps) | ผลลัพธ์ที่คาดหวัง (Expected Result) | ผลลัพธ์ที่เกิดขึ้นจริง (Actual Result) | สถานะ (Status) |
+|:---:|---|---|---|---|:---:|
+| **TC-01** | สมัครสมาชิกด้วยข้อมูลถูกต้อง (Register Success) | 1. ไปที่ `/#/register`<br>2. กรอกชื่อ `สมชาย ใจดี`<br>3. กรอกอีเมลและรหัสผ่านที่ถูกต้อง<br>4. กดยืนยันการสมัคร | บัญชีถูกสร้างใน Firebase Auth, บันทึกข้อมูลลง Firestore `/users/{uid}` ด้วยบทบาท `student` และเข้าสู่ Dashboard อัตโนมัติ | บัญชีถูกสร้างสำเร็จ บันทึก `role: 'student'` แสดงแจ้งเตือนสีเขียว และนำทางไปยังหน้า Dashboard ทันที | **PASS** |
+| **TC-02** | ตรวจสอบ Validation ฟอร์มสมัครสมาชิก (Register Validation) | 1. กรอกรหัสผ่านน้อยกว่า 6 ตัวอักษร<br>2. กรอกรหัสผ่านและยืนยันไม่ตรงกัน<br>3. ใช้อีเมลที่มีอยู่แล้วในระบบ | ระบบต้องปฏิเสธการส่งฟอร์ม แสดงข้อความแจ้งเตือนภาษาไทยที่ชัดเจน และไม่เกิด Unhandled Exception | แสดงข้อความเตือนความยาวรหัสผ่าน, ความไม่ตรงกันของรหัสผ่าน และเตือนอีเมลซ้ำตามลำดับอย่างถูกต้อง | **PASS** |
+| **TC-03** | เข้าสู่ระบบและออกจากระบบ (Login & Logout) | 1. ไปที่ `/#/login`<br>2. กรอกอีเมลและรหัสผ่านที่ถูกต้อง<br>3. ตรวจสอบการเข้าสู่ระบบ<br>4. กดปุ่ม Logout ที่เมนูโปรไฟล์ | เข้าสู่ Dashboard ได้สำเร็จ และเมื่อ Logout แล้ว Session ต้องถูกล้าง พร้อม Redirect กลับมายังหน้า Login | Session ถูกจัดการผ่าน `onAuthStateChanged` เมื่อ Logout ข้อมูลใน State ถูกเคลียร์ และถูกส่งกลับมาหน้า Login | **PASS** |
+| **TC-04** | การเพิ่มงานใหม่ (Create Task) | 1. กดปุ่ม "เพิ่มงานใหม่"<br>2. กรอกชื่องาน, รายวิชา, วันกำหนดส่ง, ความสำคัญ, สถานะ<br>3. กดบันทึก | ข้อมูลงานถูกสร้างและบันทึกลงคอลเลกชัน `tasks` ใน Cloud Firestore โดยมี `ownerUid` ตรงกับผู้ใช้ | งานถูกสร้างใน Firestore ทันที แสดง Toast แจ้งเตือนสีเขียว และรายการงานปรากฏในหน้ารายการทันที | **PASS** |
+| **TC-05** | การค้นหา กรอง และสลับมุมมองงาน (Read & Filter Tasks) | 1. ค้นหาชื่องานในช่อง Search<br>2. กรองตามสถานะ และระดับความสำคัญ<br>3. สลับมุมมอง List, Grid และ Calendar | แสดงเฉพาะงานที่ตรงตามเงื่อนไข ปฏิทินแสดงงานตรงตามวันกำหนดส่ง และนับจำนวนถูกต้อง | ตัวกรองทำงานแบบเรียลไทม์ ปฏิทินรายเดือนแสดงสีตามระดับความสำคัญ สามารถคลิกดูงานได้ทุกรายการ | **PASS** |
+| **TC-06** | การแก้ไขข้อมูลงาน (Update Task) | 1. กดปุ่มแก้ไขที่รายการงาน<br>2. ปรับเปลี่ยนชื่องานและสถานะเป็น `In Progress`<br>3. กดบันทึกการแก้ไข | ข้อมูลงานใน Cloud Firestore ได้รับการอัปเดต พร้อมบันทึกเวลา `updatedAt` | ข้อมูลในหน้ารายละเอียดและหน้ารายการอัปเดตทันทีแบบ Real-time Snapshot | **PASS** |
+| **TC-07** | การลบงานและ Confirmation Modal (Delete Task) | 1. กดปุ่มลบงานที่รายการงาน<br>2. ตรวจสอบ Modal ยืนยัน<br>3. กดยืนยันการลบ | ระบบแสดงหน้าต่างยืนยัน และเมื่อกดยืนยัน เอกสารจะถูกลบออกจาก Firestore อย่างถาวร | Modal แสดงคำเตือนชัดเจน เมื่องานถูกลบจะหายไปจากรายการทันที และมี Toast แจ้งผล | **PASS** |
+| **TC-08** | การส่งงานและตรวจสอบ URL (Assignment Submission) | 1. ไปที่ `/#/submit`<br>2. เลือกงานที่ต้องการส่ง<br>3. ทดสอบกรอก URL ผิด เช่น `abc`<br>4. กรอก URL ที่ถูกต้อง เช่น `https://github.com/...`<br>5. กดยืนยันส่งงาน | ระบบต้องบล็อก URL ที่ผิดรูปแบบ และเมื่อกรอก URL ถูกต้อง จะปรับสถานะงานเป็น `Completed` พร้อมบันทึกเวลา | ฟังก์ชัน `isValidHttpUrl` ดักจับ URL ผิดได้ถูกต้อง เมื่อส่งผ่าน สถานะงานเปลี่ยนเป็นเสร็จสมบูรณ์ทันที | **PASS** |
+| **TC-09** | การส่งข้อเสนอแนะและแจ้งบั๊ก (Feedback Form) | 1. ไปที่ `/#/feedback`<br>2. เลือกหมวดหมู่ `bug`<br>3. กรอกหัวข้อและรายละเอียด<br>4. กดส่งข้อเสนอแนะ | บันทึกข้อเสนอแนะลงคอลเลกชัน `/feedbacks` ใน Firestore โดยระบุ `userUid` และ Masking อีเมล | ข้อมูลถูกบันทึกลง Firestore สำเร็จ ปรากฏในประวัติของนักศึกษา และแสดงในหน้า Admin Dashboard | **PASS** |
+| **TC-10** | การจัดการโปรไฟล์และเปลี่ยนรหัสผ่าน (Profile & Password Update) | 1. ไปที่ `/#/profile`<br>2. แก้ไขชื่อ-นามสกุลแล้วกดบันทึก<br>3. กรอกรหัสผ่านใหม่และยืนยัน<br>4. กดเปลี่ยนรหัสผ่าน | ชื่อที่แสดงในระบบอัปเดต และรหัสผ่านใน Firebase Authentication ถูกเปลี่ยนเป็นรหัสใหม่สำเร็จ | ชื่อโปรไฟล์อัปเดตทันที รหัสผ่านถูกอัปเดตผ่าน Firebase Auth และทดสอบล็อกอินด้วยรหัสใหม่ได้ | **PASS** |
+| **TC-11** | การปกปิดข้อมูลส่วนบุคคล (Email Data Masking) | 1. เข้าสู่ระบบด้วยบัญชี Admin<br>2. ไปที่ `/#/admin-users` และ `/#/admin-dashboard`<br>3. ตรวจสอบคอลัมน์อีเมล | อีเมลสมาชิกต้องแสดงในรูปแบบปกปิด เช่น `st****@domain.com` หรือ `bu****@gmail.com` | อีเมลสมาชิกทั้งหมดในตารางและ Modal รายละเอียดถูก Masking ด้วย `maskEmail` อย่างถูกต้อง | **PASS** |
+| **TC-12** | การป้องกัน IDOR (Insecure Direct Object References) | 1. นักศึกษา A พยายามเข้าถึงงานของนักศึกษา B ด้วย URL `#/tasks/{b_task_id}`<br>2. ส่งคำขอลบงานของผู้อื่น | Cloud Firestore Rules ต้องปฏิเสธคำขอด้วย `PERMISSION_DENIED` และหน้าเว็บแจ้งว่าไม่มีสิทธิ์ | ระบบไม่อนุญาตให้อ่านหรือแก้ไขงานของผู้อื่น และแสดงข้อความแจ้งเตือนอย่างปลอดภัย | **PASS** |
+| **TC-13** | การป้องกัน Privilege Escalation และสิทธิ Admin (Authorization Guard) | 1. ล็อกอินด้วยบัญชี Student<br>2. พิมพ์ URL ตรงไปที่ `/#/admin-dashboard` หรือ `/#/admin-users` | ระบบต้องไม่อนุญาตให้เข้าถึง และนำทางไปยังหน้า `403 Forbidden` ทันที | ระบบตรวจสอบสิทธิ์ผ่าน Router Guard และ Security Rules นำทางไปหน้า **403 Forbidden** ทันที | **PASS** |
+| **TC-14** | การป้องกัน Cross-Site Scripting (XSS Attack Payload) | 1. กรอกชื่องานเป็น `<script>alert('XSS')</script>`<br>2. กรอกคำอธิบายเป็น `<img src=x onerror=alert(1)>` | โค้ด HTML/JS ต้องไม่ถูกประมวลผลเป็นสคริปต์ และแสดงผลเป็นข้อความธรรมดา | React Virtual DOM Escape ข้อความ และฟังก์ชัน `sanitizeText` กรองแท็กออก ไม่มี Alert รัน | **PASS** |
+| **TC-15** | การป้องกัน SQL/NoSQL Injection Payload | 1. ในช่องค้นหาและฟอร์ม กรอก `' OR '1'='1` หรือ `admin' --`<br>2. ส่งคำขอบันทึก | ระบบต้องไม่ล่ม ไม่เกิดข้อผิดพลาดด้านไวยากรณ์ และไม่เปิดเผยข้อมูลส่วนอื่น | ระบบประมวลผลเป็นสตริงธรรมดา ไม่มีข้อผิดพลาดทางไวยากรณ์ และ Firestore ปลอดจาก SQL Injection | **PASS** |
+| **TC-16** | การแสดงผลและการตอบสนองของหน้าจอ (Responsive UI) | 1. ทดสอบเปิดบน Desktop (1920px)<br>2. ทดสอบบน Tablet (768px)<br>3. ทดสอบบน Mobile (375px) | เลย์เอาต์ปรับตัวอัตโนมัติ มี Mobile Drawer สำหรับเมนู และตารางสามารถเลื่อนดูได้ไม่ล้นจอ | Sidebar ปรับเป็น Hamburger Menu บนจอเล็ก ฟอร์มและการ์ดจัดเรียงเป็น 1 คอลัมน์สมบูรณ์ | **PASS** |
+| **TC-17** | การกู้คืนรหัสผ่านผ่านระบบอีเมลภายนอก (Forgot Password via SMTP) | 1. ส่งคำขอรีเซ็ตรหัสผ่านไปยังอีเมลภายนอกผ่าน SMTP Server | ผู้ใช้ได้รับอีเมลลิงก์กู้คืนรหัสผ่านจาก Mail Server | ปัจจุบันระบบใช้การเปลี่ยนรหัสผ่านในหน้า Profile ขณะเข้าสู่ระบบ ยังไม่มีการต่อ SMTP ภายนอก | **NOT TESTED** |
+| **TC-18** | การทดสอบรองรับปริมาณการใช้งานพร้อมกันสูง (Concurrency Stress Test) | 1. จำลองผู้ใช้งานพร้อมกัน 2,000 Concurrent Requests ด้วยเครื่องมือยิงโหลด | ระบบตอบสนองในเวลาต่ำกว่า 2 วินาทีโดยไม่มี Request หลุด | ยังไม่ได้ทำการทดสอบยิงโหลดขนาดใหญ่ในสภาพแวดล้อม Production (ทดสอบระดับ Functional/Security) | **NOT TESTED** |
+
+---
+
+## 6. หลักฐานประกอบการทดสอบ (Test Evidence)
+
+### 6.1 หลักฐานกฎความปลอดภัย Cloud Firestore Security Rules (Zero-Trust ABAC)
+กฎความปลอดภัยถูกออกแบบให้ Deny-by-Default และตรวจสอบสิทธิ์ผ่าน UID จริง:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. ปิดกั้นการเข้าถึงทั้งหมดเป็นค่าเริ่มต้น (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. ป้องกัน IDOR ในคอลเลกชันงาน (Tasks)
+    match /tasks/{taskId} {
+      allow get: if isSignedIn() && (existing().ownerUid == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.ownerUid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(taskId) && isValidTask(incoming()) 
+                     && incoming().ownerUid == request.auth.uid;
+      allow update: if isSignedIn() && isValidTask(incoming()) 
+                     && ((existing().ownerUid == request.auth.uid && incoming().ownerUid == existing().ownerUid) || isAdmin());
+      allow delete: if isSignedIn() && (existing().ownerUid == request.auth.uid || isAdmin());
+    }
+
+    // 3. ป้องกันการเข้าถึงรายชื่อสมาชิกทั้งหมด (ห้าม Student อ่านรายชื่อคนอื่น)
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin(); // Student ไม่สามารถ List สมาชิกได้
+      allow create: if isOwner(userId) && isValidUserProfile(incoming()) 
+                     && incoming().role == 'student' && incoming().status == 'active';
+    }
+  }
+}
+```
+
+### 6.2 หลักฐานฟังก์ชัน Data Masking ป้องกัน Sensitive Data Exposure
+```typescript
+export function maskEmail(email: string | null | undefined): string {
+  if (!email || !email.includes('@')) {
+    return '***@***.***';
+  }
+  const [localPart, domain] = email.split('@');
+  if (localPart.length <= 2) {
+    return `${localPart.charAt(0)}****@${domain}`;
+  }
+  const visiblePrefix = localPart.slice(0, 2);
+  return `${visiblePrefix}****@${domain}`;
+}
+```
+*ผลลัพธ์การทดสอบ:* อีเมล `student1@demo.edu` แสดงผลเป็น `st****@demo.edu` และ `buddykung2019@gmail.com` แสดงผลเป็น `bu****@gmail.com` ทั้งในตารางและ Modal รายละเอียด
+
+### 6.3 หลักฐานการกรองข้อมูล Injection & URL Validation
+```typescript
+export function isValidHttpUrl(string: string): boolean {
+  try {
+    const url = new URL(string);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export function sanitizeText(input: string): string {
+  if (!input) return '';
+  return input.trim().replace(/[<>]/g, '');
+}
+```
+
+---
+
+## 7. ปัญหาที่พบและแนวทางแก้ไข (Issues Encountered & Mitigations)
+
+| ลำดับ | ปัญหาที่ตรวจพบ (Issue / Defect) | สาเหตุที่แท้จริง (Root Cause) | แนวทางการแก้ไขและผลลัพธ์ (Mitigation & Result) |
+|:---:|---|---|---|
+| **1** | การล็อกอินด้วยบัญชีทดสอบในตอนแรกไม่สำเร็จ (แสดงข้อความ "ไม่สามารถเข้าสู่ระบบได้") | 1. โปรเจ็กต์ Firebase ที่สร้างใหม่ยังไม่มีบัญชีทดสอบในระบบ<br>2. ตัวเลือก Email/Password ใน Firebase Console ยังไม่ได้ถูกเปิดใช้งานเป็นค่าเริ่มต้น | ปรับปรุงระบบให้มีการแจ้งเตือนที่ชัดเจน พร้อมลิงก์ตรงไปยังหน้าตั้งค่า Firebase Console และสร้างบัญชีผู้ใช้งานผ่านฟอร์ม Register จริง ทำให้ระบบยืนยันตัวตนสำเร็จ 100% |
+| **2** | การค้นหาและสลับการแสดงผลแบบปฏิทินแสดงผลผิดเพี้ยนเมื่อรูปแบบวันที่ไม่ตรงกัน | วันที่จัดเก็บในบาง Record มีทั้ง Date Format (YYYY-MM-DD) และ ISO String | ปรับปรุงให้ฟังก์ชันตัดสตริงเฉพาะส่วนวันเดือนปี (`dueDate.split('T')[0]`) ทำให้ปฏิทินสามารถจับคู่งานและจัดหมวดหมู่งานได้อย่างแม่นยำทุกกรณี |
+| **3** | การรีเฟรชหน้าเว็บบน Vercel เกิดข้อผิดพลาด HTTP 404 Not Found | เว็บเป็นแบบ Single Page Application (SPA) เมื่อผู้ใช้กด Refresh ที่ Route ย่อย เว็บเซิร์ฟเวอร์จะหาไฟล์ HTML ไม่พบ | สร้างไฟล์ `vercel.json` กำหนดคำสั่ง `rewrites` ให้ส่งคำขอทั้งหมดกลับมาที่ `/index.html` พร้อมแนบ Security Headers ป้องกัน Clickjacking และ MIME Sniffing |
+| **4** | ความเสี่ยงที่นักศึกษาจะส่งสิทธิ์ `role: 'admin'` มาเองในขณะสมัครสมาชิก | ข้อมูลที่ส่งมาจาก Client อาจถูกดัดแปลงผ่าน HTTP Interceptor (เช่น Burp Suite หรือ Postman) | กำหนด Security Rules ในระดับ Cloud Firestore ให้ตรวจสอบว่าเอกสารใหม่ต้องมี `incoming().role == 'student'` เท่านั้น หากเป็นค่าอื่นจะถูกปฏิเสธทันที |
+
+---
+
+## 8. สรุปผลการทดสอบ (Summary of Results)
+
+จากการทดสอบระบบ **StudentHub** ตามแผนการทดสอบทั้งหมด ผลลัพธ์สรุปได้ดังนี้:
+
+### 8.1 สถิติผลการทดสอบ (Test Statistics)
+- **จำนวน Test Cases ทั้งหมด:** 18 กรณี
+- **ผ่านการทดสอบ (PASS):** 16 กรณี (**88.89%** ของเคสทั้งหมด / **100%** ของเคสที่อยู่ในขอบเขตหลัก)
+- **ไม่ผ่านการทดสอบ (FAIL):** 0 กรณี (**0.00%**)
+- **ติดขัด/ระงับชั่วคราว (BLOCKED):** 0 กรณี (**0.00%**)
+- **ยังไม่ได้ทดสอบ (NOT TESTED):** 2 กรณี (**11.11%** ได้แก่ การส่งอีเมล Forgot Password ผ่าน SMTP จริง และ Load Stress Testing ระดับองค์กร)
+
+### 8.2 สรุปความเห็นของผู้ประเมินระบบ
+ระบบ **StudentHub** ผ่านเกณฑ์การประเมินทั้งในแง่ของฟังก์ชันการใช้งาน ความถูกต้องของข้อมูลบนฐานข้อมูลจริง และมาตรการด้านความปลอดภัยตามมาตรฐานสากล OWASP:
+1. ข้อมูลทั้งหมดถูกจัดเก็บบน **Cloud Firestore (Project ID: `studenthub-62716`)** จริง ไม่มีการใช้ LocalStorage หรือ Mock Data แทนฐานข้อมูล
+2. ระบบป้องกันช่องโหว่ **IDOR** และ **Privilege Escalation** ได้อย่างสมบูรณ์แบบด้วย Cloud Firestore Security Rules
+3. มีการปกปิดข้อมูลส่วนบุคคล (**Data Masking**) อย่างสม่ำเสมอในทุกจุดที่เกี่ยวข้อง
+4. ระบบมีความพร้อมสำหรับการนำไปใช้งานจริง (Production Readiness) และสามารถ Deploy ขึ้น **Vercel** ได้ทันทีโดยไม่พบปัญหา SPA Routing
+
+---
+*ลงชื่อผู้ทดสอบและจัดทำรายงาน*  
+**ทีมพัฒนาระบบ StudentHub**  
+วิชา Web Application Development and Security Testing
