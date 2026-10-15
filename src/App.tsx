@@ -146,9 +146,9 @@ const AppContent: React.FC = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center space-y-4">
-        <div className="w-10 h-10 border-3 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-        <div className="text-xs font-semibold text-slate-400 tracking-wider uppercase">
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center space-y-4">
+        <div className="w-10 h-10 border-3 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+        <div className="text-xs font-semibold text-slate-600 tracking-wider uppercase">
           กำลังเตรียมระบบ StudentHub...
         </div>
       </div>
@@ -158,7 +158,7 @@ const AppContent: React.FC = () => {
   const isAuthPage = currentPage === 'login' || currentPage === 'register';
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] flex flex-col font-sans">
       {/* Top Navigation */}
       <Navbar
         currentPage={currentPage}

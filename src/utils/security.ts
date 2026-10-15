@@ -98,7 +98,7 @@ export function getTaskUrgency(dueDateString: string, status: string): {
       isUrgent: false,
       daysRemaining: 0,
       badgeLabel: 'ส่งแล้ว',
-      badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+      badgeColor: 'bg-emerald-50 text-[#16A34A] border-emerald-200'
     };
   }
 
@@ -113,7 +113,7 @@ export function getTaskUrgency(dueDateString: string, status: string): {
       isUrgent: false,
       daysRemaining: diffDays,
       badgeLabel: `เกินกำหนด ${Math.abs(diffDays)} วัน`,
-      badgeColor: 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+      badgeColor: 'bg-rose-50 text-rose-700 border-rose-200'
     };
   } else if (diffDays === 0) {
     return {
@@ -121,7 +121,7 @@ export function getTaskUrgency(dueDateString: string, status: string): {
       isUrgent: true,
       daysRemaining: 0,
       badgeLabel: 'ครบกำหนดวันนี้!',
-      badgeColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200'
     };
   } else if (diffDays <= 3) {
     return {
@@ -129,7 +129,7 @@ export function getTaskUrgency(dueDateString: string, status: string): {
       isUrgent: true,
       daysRemaining: diffDays,
       badgeLabel: `เหลืออีก ${diffDays} วัน`,
-      badgeColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200'
     };
   } else {
     return {
@@ -137,7 +137,7 @@ export function getTaskUrgency(dueDateString: string, status: string): {
       isUrgent: false,
       daysRemaining: diffDays,
       badgeLabel: `เหลืออีก ${diffDays} วัน`,
-      badgeColor: 'bg-slate-700/50 text-slate-300 border-slate-600/40'
+      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200'
     };
   }
 }

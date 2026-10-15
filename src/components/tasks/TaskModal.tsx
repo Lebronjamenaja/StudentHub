@@ -93,39 +93,39 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative my-8">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+      <div className="bg-white border border-slate-200/80 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative my-8">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-purple-600/10 text-purple-400 border border-purple-500/20">
+            <div className="p-2.5 rounded-xl bg-blue-50 text-[#2563EB] border border-blue-200/60">
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-100">
+              <h2 className="text-lg font-bold text-[#172554]">
                 {initialData ? 'แก้ไขงาน / การบ้าน' : 'เพิ่มงาน / การบ้านใหม่'}
               </h2>
-              <p className="text-xs text-slate-400">กรอกข้อมูลและกำหนดส่งงานให้ครบถ้วน</p>
+              <p className="text-xs text-slate-500">กรอกข้อมูลและกำหนดส่งงานให้ครบถ้วน</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+          <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              ชื่องาน / หัวข้อการบ้าน <span className="text-rose-400">*</span>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+              ชื่องาน / หัวข้อการบ้าน <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -135,18 +135,18 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="เช่น รายงาน Final Project, การบ้านแบบฝึกหัดบทที่ 4"
-                className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] rounded-xl px-4 py-2.5 text-sm text-[#1E293B] placeholder-slate-400 transition-colors"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                รายวิชา / รหัสวิชา <span className="text-rose-400">*</span>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                รายวิชา / รหัสวิชา <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <BookOpen className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                <BookOpen className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="text"
                   required
@@ -154,23 +154,23 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="เช่น CS301 Web App, SWE202"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#1E293B] placeholder-slate-400 transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                วันกำหนดส่ง (Due Date) <span className="text-rose-400">*</span>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                วันกำหนดส่ง (Due Date) <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Calendar className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="date"
                   required
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#1E293B] transition-colors"
                 />
               </div>
             </div>
@@ -178,15 +178,15 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
                 ระดับความสำคัญ (Priority)
               </label>
               <div className="relative">
-                <Flag className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                <Flag className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 transition-colors appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#1E293B] transition-colors appearance-none cursor-pointer"
                 >
                   <option value="Low">ต่ำ (Low Priority)</option>
                   <option value="Medium">ปานกลาง (Medium)</option>
@@ -196,15 +196,15 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
                 สถานะการทำงาน (Status)
               </label>
               <div className="relative">
-                <CheckCircle2 className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                <CheckCircle2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 transition-colors appearance-none cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#1E293B] transition-colors appearance-none cursor-pointer"
                 >
                   <option value="Pending">รอดำเนินการ (Pending)</option>
                   <option value="In Progress">กำลังทำ (In Progress)</option>
@@ -215,7 +215,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
               คำอธิบายรายละเอียดงาน (ไม่เกิน 2,000 ตัวอักษร)
             </label>
             <textarea
@@ -224,26 +224,26 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="ระบุข้อกำหนด เกณฑ์การให้คะแนน ลิงก์เอกสารประกอบ หรือสิ่งที่ต้องทำ..."
-              className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-xl p-3.5 text-sm text-slate-100 placeholder-slate-500 transition-colors resize-none"
+              className="w-full bg-slate-50 border border-slate-200 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] rounded-xl p-3.5 text-sm text-[#1E293B] placeholder-slate-400 transition-colors resize-none"
             />
-            <div className="text-right text-[11px] text-slate-500 mt-1">
+            <div className="text-right text-[11px] text-slate-400 mt-1">
               {description.length}/2000
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               ยกเลิก
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all shadow-md shadow-purple-950 disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-[#172554] hover:bg-[#1e3a8a] active:bg-[#172554] transition-all shadow-xs disabled:opacity-50 flex items-center gap-2 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

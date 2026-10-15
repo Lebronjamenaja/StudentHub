@@ -51,37 +51,37 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onSelectTask 
   const todayStr = new Date().toISOString().split('T')[0];
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-purple-600/10 text-purple-400 border border-purple-500/20">
+          <div className="p-2.5 rounded-xl bg-blue-50 text-[#2563EB] border border-blue-200/60">
             <CalendarIcon className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-100">
+            <h3 className="text-lg font-bold text-[#172554]">
               ปฏิทินกำหนดส่งงาน — {monthNames[month]} พ.ศ. {year + 543}
             </h3>
-            <p className="text-xs text-slate-400">ตรวจสอบกำหนดการและจัดการเวลาส่งงาน</p>
+            <p className="text-xs text-slate-500">ตรวจสอบกำหนดการและจัดการเวลาส่งงาน</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={prevMonth}
-            className="p-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
             title="เดือนก่อนหน้า"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setCurrentDate(new Date())}
-            className="px-3 py-1.5 rounded-xl border border-slate-800 hover:bg-slate-800 text-xs font-medium text-slate-300 hover:text-white transition-colors"
+            className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors cursor-pointer"
           >
             เดือนนี้
           </button>
           <button
             onClick={nextMonth}
-            className="p-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
             title="เดือนถัดไป"
           >
             <ChevronRight className="w-4 h-4" />
@@ -94,7 +94,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onSelectTask 
         {daysOfWeek.map((day, idx) => (
           <div
             key={idx}
-            className="text-center text-xs font-semibold py-2 text-slate-400 uppercase tracking-wider"
+            className="text-center text-xs font-semibold py-2 text-slate-500 uppercase tracking-wider"
           >
             {day}
           </div>
@@ -108,7 +108,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onSelectTask 
             return (
               <div
                 key={`empty-${idx}`}
-                className="min-h-[100px] bg-slate-950/30 rounded-xl border border-slate-800/40 p-2 opacity-30"
+                className="min-h-[100px] bg-slate-50/50 rounded-2xl border border-slate-100 p-2 opacity-50"
               />
             );
           }
@@ -120,22 +120,22 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onSelectTask 
           return (
             <div
               key={`day-${day}`}
-              className={`min-h-[105px] rounded-xl border p-2 flex flex-col transition-all ${
+              className={`min-h-[105px] rounded-2xl border p-2 flex flex-col transition-all ${
                 isToday
-                  ? 'bg-purple-950/20 border-purple-500/50 shadow-sm shadow-purple-950'
-                  : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700'
+                  ? 'bg-blue-50/40 border-[#2563EB]/40 shadow-xs'
+                  : 'bg-white border-slate-200/70 hover:border-slate-300'
               }`}
             >
               <div className="flex items-center justify-between mb-1.5">
                 <span
                   className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full ${
-                    isToday ? 'bg-purple-600 text-white' : 'text-slate-400'
+                    isToday ? 'bg-[#2563EB] text-white shadow-xs' : 'text-slate-700'
                   }`}
                 >
                   {day}
                 </span>
                 {dayTasks.length > 0 && (
-                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
                     {dayTasks.length} งาน
                   </span>
                 )}
@@ -148,18 +148,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onSelectTask 
                     <button
                       key={task.id}
                       onClick={() => onSelectTask(task.id)}
-                      className={`w-full text-left p-1.5 rounded-lg text-xs truncate border transition-all block ${
+                      className={`w-full text-left p-1.5 rounded-lg text-xs truncate border transition-all block cursor-pointer ${
                         isCompleted
-                          ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300 hover:bg-emerald-900/40'
+                          ? 'bg-emerald-50 border-emerald-200/80 text-emerald-800 hover:bg-emerald-100/70'
                           : task.priority === 'High'
-                          ? 'bg-rose-950/40 border-rose-500/30 text-rose-200 hover:bg-rose-900/40'
-                          : 'bg-indigo-950/40 border-indigo-500/30 text-indigo-200 hover:bg-indigo-900/40'
+                          ? 'bg-rose-50 border-rose-200/80 text-rose-800 hover:bg-rose-100/70'
+                          : 'bg-blue-50 border-blue-200/80 text-blue-800 hover:bg-blue-100/70'
                       }`}
                       title={`${task.subject}: ${task.title}`}
                     >
                       <div className="flex items-center gap-1">
                         {isCompleted ? (
-                          <CheckCircle className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <CheckCircle className="w-3 h-3 text-[#16A34A] shrink-0" />
                         ) : (
                           <Clock className="w-3 h-3 text-slate-400 shrink-0" />
                         )}

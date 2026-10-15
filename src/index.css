@@ -2,14 +2,20 @@
 
 @theme {
   --font-sans: "Prompt", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --color-primary-navy: #172554;
+  --color-secondary-blue: #2563eb;
+  --color-accent-purple: #7c3aed;
+  --color-app-bg: #f8fafc;
+  --color-app-text: #1e293b;
+  --color-app-success: #16a34a;
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #0b1120;
-  color: #f1f5f9;
+  background-color: #f8fafc;
+  color: #1e293b;
 }
