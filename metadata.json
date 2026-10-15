@@ -1,0 +1,6 @@
+{
+  "name": "StudentHub — Student Assignment and Task Management System",
+  "description": "ระบบจัดการงานและกำหนดส่งงานสำหรับนักศึกษา พร้อมระบบยืนยันตัวตน บทบาทผู้ใช้ และการปกป้องข้อมูลส่วนบุคคลตามมาตรฐานความปลอดภัย",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

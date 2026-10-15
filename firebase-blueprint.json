@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile containing authentication metadata, role and status",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "email": { "type": "string", "minLength": 3, "maxLength": 254 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "role": { "type": "string", "enum": ["student", "admin"] },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["uid", "email", "displayName", "role", "status"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Student assignment and task entity",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "ownerUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "subject": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "dueDate": { "type": "string", "maxLength": 50 },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High"] },
+        "status": { "type": "string", "enum": ["Pending", "In Progress", "Completed"] },
+        "submissionUrl": { "type": "string", "maxLength": 500 },
+        "submissionNote": { "type": "string", "maxLength": 1000 },
+        "submittedAt": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "ownerUid", "title", "subject", "dueDate", "priority", "status"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "User feedback report regarding bugs, features, or system performance",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "userUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "userEmailMasked": { "type": "string", "maxLength": 254 },
+        "title": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "category": { "type": "string", "enum": ["bug", "feature", "ui", "security", "general"] },
+        "details": { "type": "string", "minLength": 5, "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["pending", "reviewed", "resolved"] },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "userUid", "title", "category", "details"]
+    },
+    "AdminRole": {
+      "title": "AdminRole",
+      "description": "Trusted administrative privilege directory document",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "email": { "type": "string", "minLength": 3, "maxLength": 254 },
+        "grantedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["uid", "email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User account profiles with RBAC role metadata and account status"
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Assignments and tasks owned by individual students"
+    },
+    "/feedbacks/{feedbackId}": {
+      "schema": "Feedback",
+      "description": "User submitted feedback messages and bug reports"
+    },
+    "/admins/{adminUid}": {
+      "schema": "AdminRole",
+      "description": "Trusted collection defining authorized admin UIDs"
+    }
+  }
+}
